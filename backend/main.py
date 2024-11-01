@@ -24,7 +24,7 @@ if os.getenv("USE_FIRESTORE_EMULATOR", "false").lower() == "true":
     db = firestore.Client(project=project_id)
 else:
     # For production, use the default credentials
-    db = firestore.Client()
+    db = firestore.Client.from_service_account_json('firestore-key.json')
 
 class Guess(BaseModel):
     name: str
