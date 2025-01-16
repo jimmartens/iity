@@ -8,12 +8,16 @@ import string
 
 app = FastAPI()
 
+origins = [
+    "http://localhost:3000",
+    #"https://frontend-403359582991.us-central1.run.app:3000",  # Production frontend URL
+    #"*"  # Allow all
+]  
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Add your frontend URL
-    # allow_origins=["http://frontend-403359582991.us-central1.run.app:3000"],  # Production frontend URL
-    # allow_origins=["*"],  # allow all
+    allow_origins=origins, 
     allow_credentials=True,
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
@@ -25,9 +29,11 @@ firestore_host = os.getenv("FIRESTORE_EMULATOR_HOST", "localhost:8080")
 
 # Initialize Firestore client
 if os.getenv("USE_FIRESTORE_EMULATOR", "false").lower() == "true":
+    print(f"Using Firestore emulator at {firestore_host}")
     db = firestore.Client(project=project_id)
 else:
     # For production, use the default credentials
+    print("Using production Firestore credentials")
     db = firestore.Client.from_service_account_json('firestore-key.json')
 
 class Guess(BaseModel):
