@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from google.cloud import firestore
 import os
+import random
+import string
 
 app = FastAPI()
 
@@ -10,6 +12,8 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],  # Add your frontend URL
+    # allow_origins=["http://frontend-403359582991.us-central1.run.app:3000"],  # Production frontend URL
+    # allow_origins=["*"],  # allow all
     allow_credentials=True,
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
@@ -35,7 +39,7 @@ class Guess(BaseModel):
 async def create_guess(guess: Guess):
     try:
         doc_ref = db.collection("guesses").document()
-        doc_ref.set(guess.dict())
+        doc_ref.set(guess.model_dump())
         return {"message": "Guess added successfully", "id": doc_ref.id}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -51,6 +55,21 @@ async def get_guesses():
         return guesses
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/")
+async def root():
+    return {"message": "Welcome to the Guessing Game API"}
+
+@app.post("/testguess")
+async def test_guess():
+    try:
+        doc_ref = db.collection("guesses").document()
+        test_guess_content = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+        test_guess = Guess(name="Test User", content=test_guess_content)
+        db.collection("guesses").document().set(test_guess.model_dump())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 if __name__ == "__main__":
     import uvicorn
