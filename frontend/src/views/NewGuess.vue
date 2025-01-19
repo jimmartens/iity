@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Take a Guess</h2>
+    <h1><b>Take a Guess</b></h1>
     <form @submit.prevent="submitGuess">
       <div>
         <label for="name">
@@ -13,8 +13,22 @@
           required
           class="block w-full p-2 border rounded"
         >
+      </div>      
+      <div class="mb-4">
+        <label for="acronym">
+          Which acronym?
+        </label>
+        <select 
+          id="acronym" 
+          v-model="acronym" 
+          required
+          class="block w-full p-2 border rounded"
+        >
+          <option value="YCHJCYADFTCSO">YCHJCYADFTCSO</option>
+          <option value="YCHJCYAQFTLHPB">YCHJCYAQFTLHPB</option>
+          <option value="IITYWYBMAD">IITYWYBMAD</option>
+        </select>
       </div>
-      
       <div class="mb-4">
         <label for="content">
           Guess
@@ -60,6 +74,7 @@ export default {
     const router = useRouter()
     const name = ref('')
     const content = ref('')
+    const acronym = ref('YCHJCYADFTCSO')  
     const error = ref('')
     const success = ref('')
 
@@ -71,15 +86,17 @@ export default {
         success.value = ''
         await axios.post(`${API_URL}/guesses`, {
           name: name.value,
-          content: content.value
+          content: content.value,
+          acronym: acronym.value
         })
-        success.value = 'Guess submitted successfully!'
+        success.value = 'Guess submitted successfully. Thanks!'
         // Clear the form
         name.value = ''
         content.value = ''
+        acronym.value = ''
         setTimeout(() => {
-          router.push('/guesses/thanks')
-        }, 1500)
+          router.push('/guesses/view')
+        }, 2000)
       } catch (e) {
         error.value = 'Failed to submit guess: ' + (e.response?.data?.detail || e.message)
         console.error('Error submitting guess:', e)
@@ -89,6 +106,7 @@ export default {
     return {
       name,
       content,
+      acronym,
       error,
       success,
       submitGuess

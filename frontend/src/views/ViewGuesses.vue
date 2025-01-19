@@ -3,12 +3,6 @@
     <div class="bg-white shadow rounded-lg p-6">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-bold">Guesses</h2>
-        <router-link 
-          to="/guesses/new"
-          class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Guess Again
-        </router-link>
       </div>
 
       <div v-if="loading" class="text-center py-4">
@@ -24,15 +18,16 @@
       </div>
 
       <div v-else class="space-y-4">
-        <table>
+        <table style="width: 100%;">
           <tbody>
-          <tr><th>Name</th><th>Guess</th><th>Created</th></tr>
+          <tr><th>Name</th><th>Acronym</th><th>Guess</th><th>Created</th></tr>
             <tr
             v-for="guess in guesses" 
             :key="guess.id" 
             class="border-b last:border-b-0 py-4"
             >            
                 <td>{{ guess.name }}</td> 
+                <td>{{ guess.acronym }}</td>
                 <td>{{ guess.content }}</td>
                 <td>{{ guess.created_at }}</td>
             </tr>
@@ -65,12 +60,22 @@ export default {
 
     const API_URL = 'http://localhost:8000'
 
+    const formatDate = (dateString) => {
+      const date = new Date(dateString)
+      return date.toISOString().slice(0, 16).replace('T', ' ')
+    }
+
     const fetchGuesses = async () => {
       try {
         loading.value = true
         error.value = ''
         const response = await axios.get(`${API_URL}/guesses`)
-        guesses.value = response.data
+        guesses.value = response.data.map(guess => {
+          return {
+            ...guess, // Spread operator to copy all properties of guess into new object
+            created_at: formatDate(guess.created_at)
+          }
+        })
       } catch (e) {
         error.value = 'Failed to load guesses: ' + (e.response?.data?.detail || e.message)
         console.error('Error fetching guesses:', e)

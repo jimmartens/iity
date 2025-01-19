@@ -38,6 +38,7 @@ else:
 
 class Guess(BaseModel):
     name: str
+    acronym: str
     content: str
     created_at: str = firestore.SERVER_TIMESTAMP
 
@@ -71,7 +72,7 @@ async def test_guess():
     try:
         doc_ref = db.collection("guesses").document()
         test_guess_content = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
-        test_guess = Guess(name="Test User", content=test_guess_content)
+        test_guess = Guess(name="Test User", content=test_guess_content, acronym="YCHJCT_TEST")
         db.collection("guesses").document().set(test_guess.model_dump())
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

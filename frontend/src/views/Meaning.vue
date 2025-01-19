@@ -1,12 +1,28 @@
-<!-- Page for acronyms to be spelled out -->
 <template>
-    <div>
+    <div class="bg-white shadow rounded-lg p-6">
       <div>
         <div>
-          <h2>Meaning of those acronyms:</h2>
-          <p>YCHJCYADFTCSO: Your curiosity has just cost you a donation for the Colorado Special Olympics.</p>
-          <p>YCHJCYAQFTLHPB: You curiosity has just coust you a quarter for the Laureden Hall Piggy Bank.</p>
-          <p>Now all of this can seem kinda silly but... </p>
+          <h2><b>Meaning of those acronyms:</b></h2>
+          <ul>
+            <li>YCHJCYADFTCSO: Your curiosity has just cost you a donation for the 
+              Colorado <a href="https://specialolympicsco.org">Special Olympics.</a></li>
+            <li>YCHJCYAQFTLHPB: You curiosity has just coust you a quarter for the
+              <a href="https://laradon.org">Laradon</a> Hall Piggy Bank.</li>
+            <li>IITYWYBMAD: If I tell you will you buy me a drink?</li>
+          </ul>
+          <br/>
+          <p>Now all of this can seem kinda silly but the Elk's organization 
+            is a charitable one and the Colorado Special Olympics and Laradon 
+            are both organizations that this Denver #17 lodge actively support.
+          </br> There are many other things that go on here and charities that we
+          support.  If your interested in knowing more go to 
+          <a href="https://denverelks.org">Denver Elks #17 wut wut</a>          
+          </p>
+          <p>
+            If you like please make a donation here at the lodge or online, as they
+            are both worthwhile charities.  Otherwise, enjoy and vote on 
+            (when available) other people's guesses.
+          </p>
         </div>
       </div>
     </div>
