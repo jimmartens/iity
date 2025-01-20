@@ -58,7 +58,7 @@ export default {
     const error = ref('')
     const loading = ref(false)
 
-    const API_URL = 'http://localhost:8000'
+    const API_URL = import.meta.env.VITE_API_URL
 
     const formatDate = (dateString) => {
       const date = new Date(dateString)

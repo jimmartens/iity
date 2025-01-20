@@ -78,7 +78,7 @@ export default {
     const error = ref('')
     const success = ref('')
 
-    const API_URL = 'http://localhost:8000'
+    const API_URL = import.meta.env.VITE_API_URL
 
     const submitGuess = async () => {
       try {

@@ -80,4 +80,7 @@ async def test_guess():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
+    #uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False) # This is what is working for prod, should make sure that I am setting it 
+    # correctly in the dev environment or that it works in both.

@@ -1,4 +1,4 @@
-FROM python:3.9
+FROM python:3.9-slim
 
 WORKDIR /app
 
@@ -8,6 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 ENV USE_FIRESTORE_EMULATOR=true
-ENV FIRESTORE_EMULATOR_HOST=firestore:8080
+ENV PORT=8000
 
+#CMD exec python main
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
