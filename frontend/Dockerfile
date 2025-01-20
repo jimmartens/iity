@@ -1,8 +1,8 @@
 FROM node:14
 
+ENV ENVIRONMENT=dev
 ENV PORT=8000
 ENV VITE_API_URL=http://localhost:8000
-# ENV VITE_API_URL = https://backend-403359582991.us-central1.run.app
 
 WORKDIR /app
 

@@ -1,0 +1,15 @@
+FROM node:14
+
+ENV ENVIRONMENT=prod
+ENV PORT=8080
+ENV VITE_API_URL=https://backend-403359582991.us-central1.run.app
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+CMD ["npm", "run", "prod", "--", "--host", "0.0.0.0"]

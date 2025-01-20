@@ -59,10 +59,15 @@ export default {
     const loading = ref(false)
 
     const API_URL = import.meta.env.VITE_API_URL
+    console.log('API_URL: ', API_URL)
 
     const formatDate = (dateString) => {
       const date = new Date(dateString)
       return date.toISOString().slice(0, 16).replace('T', ' ')
+    }
+
+    const shortenedAcronym = (acronym) => {
+      return acronym.length > 4? '...' + acronym.slice(-4) : acronym
     }
 
     const fetchGuesses = async () => {
@@ -73,6 +78,7 @@ export default {
         guesses.value = response.data.map(guess => {
           return {
             ...guess, // Spread operator to copy all properties of guess into new object
+            acronym: shortenedAcronym(guess.acronym), 
             created_at: formatDate(guess.created_at)
           }
         })

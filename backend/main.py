@@ -8,11 +8,13 @@ import string
 
 app = FastAPI()
 
-origins = [
-    "http://localhost:3000",
-    #"https://frontend-403359582991.us-central1.run.app:3000",  # Production frontend URL
-    #"*"  # Allow all
-]  
+origins = []
+if os.getenv("ENVIRONMENT") == "prod":
+    origins.append("https://frontend-403359582991.us-central1.run.app")
+    #origins.append("*") # Allow all
+else:
+    origins.append("http://localhost:3000")
+
 
 # Configure CORS
 app.add_middleware(
@@ -77,10 +79,7 @@ async def test_guess():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.environ.get("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
-    #uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False) # This is what is working for prod, should make sure that I am setting it 
-    # correctly in the dev environment or that it works in both.
+    port = int(os.environ.get("PORT"))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False) # Test in dev.
