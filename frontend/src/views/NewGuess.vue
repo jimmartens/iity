@@ -6,21 +6,21 @@
         <label for="name">
           Name
         </label>
-        <input 
+        <input
           id="name"
-          v-model="name" 
-          placeholder="Your name" 
+          v-model="name"
+          placeholder="Your name"
           required
           class="block w-full p-2 border rounded"
         >
-      </div>      
+      </div>
       <div class="mb-4">
         <label for="acronym">
           Which acronym?
         </label>
-        <select 
-          id="acronym" 
-          v-model="acronym" 
+        <select
+          id="acronym"
+          v-model="acronym"
           required
           class="block w-full p-2 border rounded"
         >
@@ -33,22 +33,24 @@
         <label for="content">
           Guess
         </label>
-        <textarea 
+        <textarea
           id="content"
-          v-model="content" 
-          placeholder="Your guess" 
+          v-model="content"
+          placeholder="Your guess"
           required
           class="block w-full p-2 border rounded"
           rows="4"
         ></textarea>
       </div>
-      
+
       <div class="flex space-x-4">
-        <button 
+        <button
           type="submit"
-          class="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"         
+          :disabled="loading"
+          class="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
-          Submit Guess
+          <span v-if="loading">Guess Being Processed...</span>
+          <span v-else>Submit Guess</span>
         </button>
       </div>
     </form>
@@ -74,17 +76,19 @@ export default {
     const router = useRouter()
     const name = ref('')
     const content = ref('')
-    const acronym = ref('YCHJCYADFTCSO')  
+    const acronym = ref('YCHJCYADFTCSO')
     const error = ref('')
     const success = ref('')
+    const loading = ref(false); // Added loading state
 
     const API_URL = import.meta.env.VITE_API_URL
     console.log('API_URL:', API_URL)
 
     const submitGuess = async () => {
-      try {
+        loading.value = true;  // Disable button, display "Processing" msg
         error.value = ''
         success.value = ''
+      try {
         await axios.post(`${API_URL}/guesses`, {
           name: name.value,
           content: content.value,
@@ -94,13 +98,15 @@ export default {
         // Clear the form
         name.value = ''
         content.value = ''
-        acronym.value = ''
+        acronym.value = 'YCHJCYADFTCSO'
         setTimeout(() => {
           router.push('/guesses/view')
         }, 2000)
       } catch (e) {
         error.value = 'Failed to submit guess: ' + (e.response?.data?.detail || e.message)
         console.error('Error submitting guess:', e)
+      } finally {
+            loading.value = false; // Re-enable button
       }
     }
 
@@ -110,7 +116,8 @@ export default {
       acronym,
       error,
       success,
-      submitGuess
+      submitGuess,
+      loading, // Added loading property
     }
   }
 }

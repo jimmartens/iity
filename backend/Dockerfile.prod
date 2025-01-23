@@ -9,5 +9,6 @@ COPY . .
 
 ENV USE_FIRESTORE_EMULATOR=false
 ENV PORT=8080
+ENV ENVIRONMENT=prod
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]

@@ -15,6 +15,7 @@ if os.getenv("ENVIRONMENT") == "prod":
 else:
     origins.append("http://localhost:3000")
 
+print(f"Environment: {os.getenv('ENVIRONMENT')}")
 
 # Configure CORS
 app.add_middleware(
@@ -82,4 +83,4 @@ async def test_guess():
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT"))
-    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False) # Test in dev.
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)

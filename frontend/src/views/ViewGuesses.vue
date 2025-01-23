@@ -67,6 +67,7 @@ export default {
     }
 
     const shortenedAcronym = (acronym) => {
+      if (!acronym) return ''      
       return acronym.length > 4? '...' + acronym.slice(-4) : acronym
     }
 

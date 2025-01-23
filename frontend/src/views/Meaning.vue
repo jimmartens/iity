@@ -5,9 +5,9 @@
           <h2><b>Meaning of those acronyms:</b></h2>
           <ul>
             <li>YCHJCYADFTCSO: Your curiosity has just cost you a donation for the 
-              Colorado <a href="https://specialolympicsco.org">Special Olympics.</a></li>
+              Colorado <a style="text-decoration: underline;" href="https://specialolympicsco.org">Special Olympics.</a></li>
             <li>YCHJCYAQFTLHPB: You curiosity has just coust you a quarter for the
-              <a href="https://laradon.org">Laradon</a> Hall Piggy Bank.</li>
+              <a style="text-decoration: underline;" href="https://laradon.org">Laradon Hall Piggy Bank</a>.</li>
             <li>IITYWYBMAD: If I tell you will you buy me a drink?</li>
           </ul>
           <br/>
@@ -16,7 +16,7 @@
             are both organizations that this Denver #17 lodge actively support.
           </br> There are many other things that go on here and charities that we
           support.  If your interested in knowing more go to 
-          <a href="https://denverelks.org">Denver Elks #17 wut wut</a>          
+          <a style="text-decoration: underline;" href="https://denverelks.org">Denver Elks #17</a>          
           </p>
           <p>
             If you like please make a donation here at the lodge or online, as they
