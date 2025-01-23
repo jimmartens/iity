@@ -20,16 +20,16 @@
       <div v-else class="space-y-4">
         <table style="width: 100%;">
           <tbody>
-          <tr><th>Name</th><th>Acronym</th><th>Guess</th><th>Created</th></tr>
+          <tr><th>Acronym</th><th>Guess</th><th>Created</th></tr>
             <tr
             v-for="guess in guesses" 
             :key="guess.id" 
-            class="border-b last:border-b-0 py-4"
+            class="guess-row"
+            @click="goToGuessDetail(guess.id)"
             >            
-                <td>{{ guess.name }}</td> 
                 <td>{{ guess.acronym }}</td>
                 <td>{{ guess.content }}</td>
-                <td>{{ guess.created_at }}</td>
+                <td>{{ guess.created_at }}</td>                
             </tr>
           </tbody>
         </table>
@@ -50,6 +50,7 @@
 <script>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import { useRouter } from 'vue-router';
 
 export default {
   name: 'ViewGuesses',
@@ -57,13 +58,18 @@ export default {
     const guesses = ref([])
     const error = ref('')
     const loading = ref(false)
+    const router = useRouter();
+    const goToGuessDetail = (id) => {
+      router.push({ name: 'GuessDetail', params: { id: id } });
+    };
 
     const API_URL = import.meta.env.VITE_API_URL
     console.log('API_URL: ', API_URL)
 
     const formatDate = (dateString) => {
       const date = new Date(dateString)
-      return date.toISOString().slice(0, 16).replace('T', ' ')
+      return date.toISOString().slice(0, 10)
+      //return date.toISOString().slice(0, 16).replace('T', ' ')
     }
 
     const shortenedAcronym = (acronym) => {
@@ -97,8 +103,20 @@ export default {
       guesses,
       error,
       loading,
-      fetchGuesses
+      fetchGuesses,
+      router, 
+      goToGuessDetail
     }
   }
 }
 </script>
+
+<style scoped>
+.guess-row {
+  cursor: pointer;  /* Make the cursor a pointer on hover */
+}
+
+.guess-row:hover {
+  background-color: #f0f0f0;  /* Add a subtle background color on hover */
+}
+</style>
