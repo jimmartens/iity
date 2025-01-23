@@ -66,6 +66,20 @@ async def get_guesses():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+@app.get("/guesses/{guess_id}")
+async def get_guess(guess_id: str):
+    try:
+        doc_ref = db.collection("guesses").document(guess_id)
+        doc = doc_ref.get()
+        if doc.exists:
+            guess_data = doc.to_dict()
+            guess_data['id'] = doc.id
+            return guess_data
+        else:
+            raise HTTPException(status_code=404, detail="Guess not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+   
 @app.get("/")
 async def root():
     return {"message": "Welcome to the Guessing Game API"}
