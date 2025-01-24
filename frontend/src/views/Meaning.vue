@@ -6,7 +6,7 @@
           <ul>
             <li><strong>YCHJCYADFTCSO:</strong> Your curiosity has just cost you a donation for the 
               Colorado <a style="text-decoration: underline;" href="https://specialolympicsco.org">Special Olympics.</a></li>
-            <li><strong>YCHJCYAQFTLHPB:</strong> You curiosity has just coust you a quarter for the
+            <li><strong>YCHJCYAQFTLHPB:</strong> Your curiosity has just cost you a quarter for the
               <a style="text-decoration: underline;" href="https://laradon.org">Laradon Hall Piggy Bank</a>.</li>
             <li><strong>IITYWYBMAD:</strong> If I tell you will you buy me a drink?</li>
           </ul>

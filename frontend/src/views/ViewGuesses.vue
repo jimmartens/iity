@@ -20,16 +20,15 @@
       <div v-else class="space-y-4">
         <table style="width: 100%;">
           <tbody>
-          <tr><th>Acronym</th><th>Guess</th><th>Created</th></tr>
-            <tr
-            v-for="guess in guesses" 
-            :key="guess.id" 
-            class="guess-row"
-            @click="goToGuessDetail(guess.id)"
-            >            
-                <td>{{ guess.acronym }}</td>
-                <td>{{ guess.content }}</td>
-                <td>{{ guess.created_at }}</td>                
+            <tr>
+              <th>Acronym</th>
+              <th>Guess</th>
+              <th>Created</th>
+            </tr>
+            <tr v-for="guess in guesses" :key="guess.id" class="guess-row" @click="goToGuessDetail(guess.id)">
+              <td>{{ guess.acronym }}</td>
+              <td>{{ guess.content }}</td>
+              <td>{{ guess.created_at }}</td>
             </tr>
           </tbody>
         </table>
@@ -37,34 +36,83 @@
     </div>
 
     <div class="mt-4 text-center">
-      <button 
-        @click="fetchGuesses"
-        class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-      >
-        Refresh Guesses
-      </button>
+      <button :disabled="currentPage <= 1" @click="changePage(currentPage - 1)"
+        class="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300">Previous</button>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+      <button :disabled="currentPage >= totalPages" @click="changePage(currentPage + 1)"
+        class="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300">Next</button>
+    </div>
+    <div class="mt-4 text-center">
+      <label for="acronym-filter">Filter:</label>
+      <select id="acronym-filter" v-model="acronymFilter" @change="getGuesses()" class="ml-2 p-2 border rounded">
+        <option value="">All</option>
+        <option value="YCHJCYADFTCSO">YCHJCYADFTCSO</option>
+        <option value="YCHJCYAQFTLHPB">YCHJCYAQFTLHPB</option>
+        <option value="IITYWYBMAD">IITYWYBMAD</option>
+      </select>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router';
 
 export default {
   name: 'ViewGuesses',
   setup() {
+    const router = useRouter()
     const guesses = ref([])
     const error = ref('')
     const loading = ref(false)
-    const router = useRouter();
+    const currentPage = ref(1)
+    const pageSize = ref(10)
+    const total = ref(0)
+    const acronymFilter = ref('')
+    const API_URL = import.meta.env.VITE_API_URL
+    const totalPages = computed(() => {
+      return Math.ceil(total.value / pageSize.value)
+    })
     const goToGuessDetail = (id) => {
       router.push({ name: 'GuessDetail', params: { id: id } });
     };
 
-    const API_URL = import.meta.env.VITE_API_URL
     console.log('API_URL: ', API_URL)
+
+    const getGuesses = async () => {
+      try {
+        loading.value = true
+        error.value = ''
+        const response = await axios.get(`${API_URL}/guesses`, {
+          params: {
+            page: currentPage.value,
+            pageSize: pageSize.value,
+            acronym: acronymFilter.value || undefined,
+          },
+        });
+        guesses.value = response.data.guesses.map(guess => {
+          return {
+            ...guess, // Spread operator to copy all properties of guess into new object
+            acronym: shortenedAcronym(guess.acronym),
+            created_at: formatDate(guess.created_at)
+          }
+        })
+        total.value = response.data.total
+      } catch (e) {
+        error.value = 'Failed to load guesses: ' + (e.response?.data?.detail || e.message)
+        console.error('Error fetching guesses:', e);
+      } finally {
+        loading.value = false
+      }
+    }
+
+    const changePage = (page) => {
+      if (page >= 1 && page <= totalPages.value) {
+        currentPage.value = page;
+        getGuesses();
+      }
+    }
 
     const formatDate = (dateString) => {
       const date = new Date(dateString)
@@ -73,39 +121,25 @@ export default {
     }
 
     const shortenedAcronym = (acronym) => {
-      if (!acronym) return ''      
-      return acronym.length > 4? '...' + acronym.slice(-4) : acronym
+      if (!acronym) return ''
+      return acronym.length > 4 ? '...' + acronym.slice(-4) : acronym
     }
 
-    const fetchGuesses = async () => {
-      try {
-        loading.value = true
-        error.value = ''
-        const response = await axios.get(`${API_URL}/guesses`)
-        guesses.value = response.data.map(guess => {
-          return {
-            ...guess, // Spread operator to copy all properties of guess into new object
-            acronym: shortenedAcronym(guess.acronym), 
-            created_at: formatDate(guess.created_at)
-          }
-        })
-      } catch (e) {
-        error.value = 'Failed to load guesses: ' + (e.response?.data?.detail || e.message)
-        console.error('Error fetching guesses:', e)
-      } finally {
-        loading.value = false
-      }
-    }
-
-    onMounted(fetchGuesses)
+    onMounted(getGuesses)
 
     return {
       guesses,
       error,
       loading,
-      fetchGuesses,
-      router, 
-      goToGuessDetail
+      getGuesses,
+      router,
+      goToGuessDetail,
+      currentPage,
+      pageSize,
+      total,
+      acronymFilter,
+      totalPages,
+      changePage,
     }
   }
 }
@@ -113,10 +147,12 @@ export default {
 
 <style scoped>
 .guess-row {
-  cursor: pointer;  /* Make the cursor a pointer on hover */
+  cursor: pointer;
+  /* Make the cursor a pointer on hover */
 }
 
 .guess-row:hover {
-  background-color: #f0f0f0;  /* Add a subtle background color on hover */
+  background-color: #f0f0f0;
+  /* Add a subtle background color on hover */
 }
 </style>

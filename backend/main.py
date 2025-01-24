@@ -5,6 +5,7 @@ from google.cloud import firestore
 import os
 import random
 import string
+from typing import List, Optional
 
 app = FastAPI()
 
@@ -55,14 +56,34 @@ async def create_guess(guess: Guess):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/guesses")
-async def get_guesses():
+async def get_guesses(
+    page: int = 1,
+    pageSize: int = 10,
+    acronym: Optional[str] = None
+):
     try:
         guesses = []
-        for doc in db.collection("guesses").stream():
+        query = db.collection("guesses")
+
+        if acronym:
+            query = query.where("acronym", "==", acronym)
+        
+        # Pagination implementation
+        start_at = (page -1) * pageSize
+        query_stream = query.order_by('created_at', direction=firestore.Query.DESCENDING).offset(start_at).limit(pageSize).stream()
+        
+        for doc in query_stream:
             guess_data = doc.to_dict()
             guess_data['id'] = doc.id
             guesses.append(guess_data)
-        return guesses
+            
+        # Calculate total for use in pagination
+        total_query = db.collection("guesses")
+        if acronym:
+            total_query = total_query.where("acronym", "==", acronym)
+        total = len([item for item in total_query.stream()])
+                
+        return {"guesses": guesses, "total": total, "page": page, "pageSize": pageSize}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     

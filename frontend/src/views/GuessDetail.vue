@@ -56,7 +56,7 @@ const giveMeaning = (acronym) => {
     break;
   case "IITYWYBMAD":
     meaning = "If I tell you will you buy me a drink?";
-    break;
+    break;  
   default:
     meaning = "Acronym not found";
   }
