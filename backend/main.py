@@ -45,6 +45,7 @@ class Guess(BaseModel):
     acronym: str
     content: str
     created_at: str = firestore.SERVER_TIMESTAMP
+    upvotes: int = 0
 
 @app.post("/guesses")
 async def create_guess(guess: Guess):
@@ -59,7 +60,8 @@ async def create_guess(guess: Guess):
 async def get_guesses(
     page: int = 1,
     pageSize: int = 10,
-    acronym: Optional[str] = None
+    acronym: Optional[str] = None,
+     sortBy: Optional[str] = "created_at",
 ):
     try:
         guesses = []
@@ -68,9 +70,15 @@ async def get_guesses(
         if acronym:
             query = query.where("acronym", "==", acronym)
         
+           # Determine sort order
+        if sortBy == "upvotes":
+             query = query.order_by('upvotes', direction=firestore.Query.DESCENDING)
+        else:
+             query = query.order_by('created_at', direction=firestore.Query.DESCENDING)
+
         # Pagination implementation
         start_at = (page -1) * pageSize
-        query_stream = query.order_by('created_at', direction=firestore.Query.DESCENDING).offset(start_at).limit(pageSize).stream()
+        query_stream = query.offset(start_at).limit(pageSize).stream()
         
         for doc in query_stream:
             guess_data = doc.to_dict()
@@ -100,6 +108,19 @@ async def get_guess(guess_id: str):
             raise HTTPException(status_code=404, detail="Guess not found")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/guesses/{guess_id}/upvote")
+async def upvote_guess(guess_id: str):
+     try:
+            doc_ref = db.collection("guesses").document(guess_id)
+            doc = doc_ref.get()
+            if doc.exists:
+               doc_ref.update({"upvotes": firestore.Increment(1)})
+               return {"message": "Upvote added successfully"}
+            else:
+                 raise HTTPException(status_code=404, detail="Guess not found")
+     except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
    
 @app.get("/")
 async def root():

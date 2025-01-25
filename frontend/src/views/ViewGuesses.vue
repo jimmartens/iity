@@ -4,7 +4,13 @@
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-bold">Guesses</h2>
       </div>
-
+      <div class="mb-4">
+        <label for="sort-by">Sort By:</label>
+        <select id="sort-by" v-model="sortBy" @change="getGuesses" class="ml-2 p-2 border rounded">
+          <option value="created_at">Date</option>
+          <option value="upvotes">Upvotes</option>
+        </select>
+      </div>
       <div v-if="loading" class="text-center py-4">
         Loading Guesses...
       </div>
@@ -18,17 +24,26 @@
       </div>
 
       <div v-else class="space-y-4">
-        <table style="width: 100%;">
-          <tbody>
+        <table style="width: 100%">
+          <thead>
             <tr>
               <th>Acronym</th>
               <th>Guess</th>
               <th>Created</th>
+              <th>Upvotes</th>
+              <th>Actions</th>
             </tr>
+          </thead>
+          <tbody>
             <tr v-for="guess in guesses" :key="guess.id" class="guess-row" @click="goToGuessDetail(guess.id)">
               <td>{{ guess.acronym }}</td>
               <td>{{ guess.content }}</td>
               <td>{{ guess.created_at }}</td>
+              <td>{{ guess.upvotes }}</td>
+              <td><button @click.stop="upvoteGuess(guess.id)" :disabled="votedGuesses.has(guess.id)"
+                  class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                  Upvote
+                </button></td>
             </tr>
           </tbody>
         </table>
@@ -37,19 +52,24 @@
 
     <div class="mt-4 text-center">
       <button :disabled="currentPage <= 1" @click="changePage(currentPage - 1)"
-        class="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300">Previous</button>
+        class="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300">
+        Previous
+      </button>
       <span>Page {{ currentPage }} of {{ totalPages }}</span>
-      <button :disabled="currentPage >= totalPages" @click="changePage(currentPage + 1)"
-        class="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300">Next</button>
-    </div>
-    <div class="mt-4 text-center">
-      <label for="acronym-filter">Filter:</label>
+      <button @click="getGuesses" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+        Refresh Guesses
+      </button>
+      <label for="acronym-filter">Filter by Acronym:</label>
       <select id="acronym-filter" v-model="acronymFilter" @change="getGuesses()" class="ml-2 p-2 border rounded">
         <option value="">All</option>
         <option value="YCHJCYADFTCSO">YCHJCYADFTCSO</option>
         <option value="YCHJCYAQFTLHPB">YCHJCYAQFTLHPB</option>
         <option value="IITYWYBMAD">IITYWYBMAD</option>
       </select>
+      <button :disabled="currentPage >= totalPages" @click="changePage(currentPage + 1)"
+        class="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300">
+        Next
+      </button>
     </div>
   </div>
 </template>
@@ -70,6 +90,8 @@ export default {
     const pageSize = ref(10)
     const total = ref(0)
     const acronymFilter = ref('')
+    const sortBy = ref("created_at")
+    const votedGuesses = ref(new Set())
     const API_URL = import.meta.env.VITE_API_URL
     const totalPages = computed(() => {
       return Math.ceil(total.value / pageSize.value)
@@ -78,7 +100,16 @@ export default {
       router.push({ name: 'GuessDetail', params: { id: id } });
     };
 
-    console.log('API_URL: ', API_URL)
+    const upvoteGuess = async (id) => {
+      try {
+        await axios.post(`${API_URL}/guesses/${id}/upvote`);
+        votedGuesses.value.add(id);
+        getGuesses(); // Refresh the guesses to show updated vote count
+      } catch (e) {
+        console.error('Error upvoting guess:', e);
+        error.value = 'Failed to upvote guess: ' + (e.response?.data?.detail || e.message)
+      }
+    };
 
     const getGuesses = async () => {
       try {
@@ -89,6 +120,7 @@ export default {
             page: currentPage.value,
             pageSize: pageSize.value,
             acronym: acronymFilter.value || undefined,
+            sortBy: sortBy.value
           },
         });
         guesses.value = response.data.guesses.map(guess => {
@@ -103,7 +135,7 @@ export default {
         error.value = 'Failed to load guesses: ' + (e.response?.data?.detail || e.message)
         console.error('Error fetching guesses:', e);
       } finally {
-        loading.value = false
+        loading.value = false;
       }
     }
 
@@ -140,6 +172,9 @@ export default {
       acronymFilter,
       totalPages,
       changePage,
+      upvoteGuess,
+      sortBy,
+      votedGuesses
     }
   }
 }
