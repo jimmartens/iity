@@ -27,22 +27,26 @@
         <table style="width: 100%">
           <thead>
             <tr>
-              <th>Acronym</th>
-              <th>Guess</th>
-              <th>Created</th>
-              <th>Upvotes</th>
-              <th>Actions</th>
+              <th class="p-2 text-left">Acronym</th>
+              <th class="p-2 text-left">Guess</th>
+              <th class="p-2 text-left hidden sm:table-cell">Created</th>
+              <th class="p-2 text-left">Votes</th>
+              <th class="p-2 text-center">+</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="guess in guesses" :key="guess.id" class="guess-row" @click="goToGuessDetail(guess.id)">
-              <td>{{ guess.acronym }}</td>
-              <td>{{ guess.content }}</td>
-              <td>{{ guess.created_at }}</td>
-              <td>{{ guess.upvotes }}</td>
+            <tr v-for="guess in guesses" :key="guess.id" class="guess-row border-b" @click="goToGuessDetail(guess.id)">
+              <td class="p-2 text-left">{{ guess.acronym }}</td>
+              <td class="p-2 text-left">{{ guess.content }}</td>
+              <td class="p-2 hidden sm:table-cell">{{ guess.created_at }}</td>
+              <td class="p-2 text-center">{{ guess.upvotes }}</td>
               <td><button @click.stop="upvoteGuess(guess.id)" :disabled="votedGuesses.has(guess.id)"
-                  class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed">
-                  Upvote
+                  class="p-1 bg-green-500 text-white text-center rounded hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
+                      clip-rule="evenodd" />
+                  </svg>
                 </button></td>
             </tr>
           </tbody>
@@ -50,26 +54,30 @@
       </div>
     </div>
 
-    <div class="mt-4 text-center">
-      <button :disabled="currentPage <= 1" @click="changePage(currentPage - 1)"
-        class="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300">
-        Previous
-      </button>
-      <span>Page {{ currentPage }} of {{ totalPages }}</span>
-      <button @click="getGuesses" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
-        Refresh Guesses
-      </button>
-      <label for="acronym-filter">Filter by Acronym:</label>
-      <select id="acronym-filter" v-model="acronymFilter" @change="getGuesses()" class="ml-2 p-2 border rounded">
-        <option value="">All</option>
-        <option value="YCHJCYADFTCSO">YCHJCYADFTCSO</option>
-        <option value="YCHJCYAQFTLHPB">YCHJCYAQFTLHPB</option>
-        <option value="IITYWYBMAD">IITYWYBMAD</option>
-      </select>
-      <button :disabled="currentPage >= totalPages" @click="changePage(currentPage + 1)"
-        class="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300">
-        Next
-      </button>
+    <div class="mt-4 space-y-4 sm:space-y-0 sm:flex sm:justify-between sm:items-center">
+      <div class="space-y-2 sm:space-y-0 sm:flex sm:items-center">
+        <select id="sort-by" v-model="sortBy" @change="getGuesses" class="p-2 border rounded mr-2">
+          <option value="created_at">Date</option>
+          <option value="upvotes">Upvotes</option>
+        </select>
+        <select id="acronym-filter" v-model="acronymFilter" @change="getGuesses()" class="p-2 border rounded">
+          <option value="">All</option>
+          <option value="YCHJCYADFTCSO">YCHJCYADFTCSO</option>
+          <option value="YCHJCYAQFTLHPB">YCHJCYAQFTLHPB</option>
+          <option value="IITYWYBMAD">IITYWYBMAD</option>
+        </select>
+      </div>
+      <div class="flex items-center justify-between sm:justify-end">
+        <button :disabled="currentPage <= 1" @click="changePage(currentPage - 1)"
+          class="px-3 py-1 bg-blue-500 text-white rounded disabled:bg-gray-300">
+          &lt;
+        </button>
+        <span class="mx-2">Page {{ currentPage }} of {{ totalPages }}</span>
+        <button :disabled="currentPage >= totalPages" @click="changePage(currentPage + 1)"
+          class="px-3 py-1 bg-blue-500 text-white rounded disabled:bg-gray-300">
+          &gt;
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -183,11 +191,22 @@ export default {
 <style scoped>
 .guess-row {
   cursor: pointer;
-  /* Make the cursor a pointer on hover */
 }
 
 .guess-row:hover {
-  background-color: #f0f0f0;
-  /* Add a subtle background color on hover */
+  background-color: #f0f0f0;  
+}
+
+@media (max-width: 640px) {
+  .guess-row td {
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .guess-row td:nth-child(2) {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 </style>
