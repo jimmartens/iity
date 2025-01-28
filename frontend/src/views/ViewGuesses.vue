@@ -53,7 +53,6 @@
         </table>
       </div>
     </div>
-
     <div class="mt-4 space-y-4 sm:space-y-0 sm:flex sm:justify-between sm:items-center">
       <div class="space-y-2 sm:space-y-0 sm:flex sm:items-center">
         <select id="sort-by" v-model="sortBy" @change="getGuesses" class="p-2 border rounded mr-2">
